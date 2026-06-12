@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, UTC
 
 import boto3
 from botocore.exceptions import ClientError
@@ -11,7 +11,7 @@ class Config:
     ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
     DEPLOY_TIME = os.getenv(
         "DEPLOY_TIME",
-        datetime.utcnow().isoformat() + "Z",
+        datetime.now(UTC).isoformat(),
     )
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 

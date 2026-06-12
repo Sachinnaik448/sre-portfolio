@@ -16,7 +16,7 @@ import time
 APP_START_TIME = time.time()
 import uuid
 
-from datetime import datetime
+from datetime import datetime, UTC
 
 app = Flask(__name__)
 APP_INFO.labels(
@@ -51,7 +51,7 @@ def after_request(response):
     response.headers["X-Request-ID"] = g.request_id
 
     log_data = {
-        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "timestamp": datetime.now(UTC).isoformat(),
         "level": "INFO",
         "method": request.method,
         "path": request.path,
@@ -118,7 +118,7 @@ def health():
         "environment": Config.ENVIRONMENT,
         "deploy_time": Config.DEPLOY_TIME,
         "request_id": g.request_id,
-        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "timestamp": datetime.now(UTC).isoformat(),
         "uptime_seconds": uptime,
     }, 200
 
