@@ -13,6 +13,7 @@ from metrics import (
 
 import json
 import time
+APP_START_TIME = time.time()
 import uuid
 
 from datetime import datetime
@@ -104,11 +105,21 @@ def home():
 
 @app.route("/health")
 def health():
+    uptime = round(
+        time.time() - APP_START_TIME,
+        2,
+    )
+
     return {
         "status": "healthy",
+        "service": "aws-sre-platform",
         "version": Config.APP_VERSION,
         "region": Config.AWS_REGION,
         "environment": Config.ENVIRONMENT,
+        "deploy_time": Config.DEPLOY_TIME,
+        "request_id": g.request_id,
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "uptime_seconds": uptime,
     }, 200
 
 

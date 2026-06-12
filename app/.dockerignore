@@ -1,0 +1,37 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+
+# Test cache
+.pytest_cache/
+
+# Logs
+*.log
+
+# Git
+.git/
+.gitignore
+
+# Environment files
+.env
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Python coverage
+.coverage
+htmlcov/
+
+# Local test artifacts
+tests/
+
+# Documentation
+docs/
