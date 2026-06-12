@@ -1,8 +1,53 @@
-from flask import Flask
+from flask import Flask, g, request
 
 from config import Config
 
+import json
+import time
+import uuid
+
+from datetime import datetime
+
 app = Flask(__name__)
+
+
+@app.before_request
+def before_request():
+    """
+    Runs before every incoming request.
+    """
+
+    g.request_id = str(uuid.uuid4())
+
+    g.start_time = time.time()
+
+
+@app.after_request
+def after_request(response):
+    """
+    Runs after every request.
+    """
+
+    duration_ms = round(
+        (time.time() - g.start_time) * 1000,
+        2,
+    )
+
+    response.headers["X-Request-ID"] = g.request_id
+
+    log_data = {
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "level": "INFO",
+        "method": request.method,
+        "path": request.path,
+        "status_code": response.status_code,
+        "duration_ms": duration_ms,
+        "request_id": g.request_id,
+    }
+
+    print(json.dumps(log_data))
+
+    return response
 
 
 @app.route("/")
