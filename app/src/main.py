@@ -2,6 +2,15 @@ from flask import Flask, g, request
 
 from config import Config
 
+from metrics import (
+    APP_INFO,
+    CPU_USAGE,
+    HTTP_REQUEST_DURATION,
+    HTTP_REQUESTS_TOTAL,
+    MEMORY_USAGE,
+    update_system_metrics,
+)
+
 import json
 import time
 import uuid
@@ -9,6 +18,11 @@ import uuid
 from datetime import datetime
 
 app = Flask(__name__)
+APP_INFO.labels(
+    version=Config.APP_VERSION,
+    region=Config.AWS_REGION,
+    environment=Config.ENVIRONMENT,
+).set(1)
 
 
 @app.before_request
@@ -44,6 +58,16 @@ def after_request(response):
         "duration_ms": duration_ms,
         "request_id": g.request_id,
     }
+
+    HTTP_REQUESTS_TOTAL.labels(
+        method=request.method,
+        endpoint=request.path,
+        status_code=response.status_code,
+    ).inc()
+
+    HTTP_REQUEST_DURATION.labels(
+        endpoint=request.path,
+    ).observe(duration_ms / 1000)
 
     print(json.dumps(log_data))
 
@@ -86,6 +110,20 @@ def health():
         "region": Config.AWS_REGION,
         "environment": Config.ENVIRONMENT,
     }, 200
+
+
+from prometheus_client import generate_latest
+from flask import Response
+
+
+@app.route("/metrics")
+def metrics():
+    update_system_metrics()
+
+    return Response(
+        generate_latest(),
+        mimetype="text/plain",
+    )
 
 
 if __name__ == "__main__":
