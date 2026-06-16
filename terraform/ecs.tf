@@ -25,8 +25,7 @@ resource "aws_ecs_task_definition" "app" {
 
       name = "app"
 
-      image = "${aws_ecr_repository.app.repository_url}:latest"
-
+      image     = "${aws_ecr_repository.app.repository_url}:${var.image_tag}"
       essential = true
 
       portMappings = [
@@ -80,4 +79,11 @@ resource "aws_ecs_task_definition" "app" {
       }
     }
   ])
+}
+
+
+variable "image_tag" {
+  description = "Docker image tag to deploy"
+  type        = string
+  default     = "latest"
 }
