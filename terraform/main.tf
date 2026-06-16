@@ -296,3 +296,53 @@ resource "aws_security_group" "ecs" {
 
 
 
+resource "aws_ecr_repository" "app" {
+
+  name = "${var.project_name}-app"
+
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+
+    scan_on_push = true
+  }
+
+  tags = {
+
+    Name = "${var.project_name}-app"
+
+    Environment = var.environment
+
+    Project = var.project_name
+  }
+}
+
+resource "aws_cloudwatch_log_group" "ecs" {
+
+  name = "/ecs/${var.project_name}"
+
+  retention_in_days = 14
+
+  tags = {
+
+    Environment = var.environment
+
+    Project = var.project_name
+  }
+}
+
+
+
+resource "aws_ecs_cluster" "main" {
+
+  name = "${var.project_name}-cluster"
+
+  tags = {
+
+    Name = "${var.project_name}-cluster"
+
+    Environment = var.environment
+
+    Project = var.project_name
+  }
+}
